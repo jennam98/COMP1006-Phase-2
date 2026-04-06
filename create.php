@@ -49,4 +49,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($bio)) {
         $error[] = "Bio is required.";
     }
-    
+
+    // if there are no errors, insert data into the database
+    if (empty($error)) {
+        $stmt = $conn->prepare("INSERT INTO resumes (first_name, last_name, position, skills, email, phone, bio) VALUES (?, ?, ?, ?, ?, ?, ?)");
+
+        $stmt->bind_param("sssssss", $first, $last, $position, $skills, $email, $phone, $bio);      
+        $stmt->execute();
+
+        header("Location: index.php");
+        exit();
+    }
+}
+?>
+
+
+
