@@ -21,3 +21,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = clean_input($_POST["email"]);
     $phone = clean_input($_POST["phone"]);
     $bio = clean_input($_POST["bio"]);
+
+
+    // validate input
+    if (empty($first)) {
+        $error[] = "First name is required.";
+    }
+    if (empty($last)) {
+        $error[] = "Last name is required.";
+    }
+    if (empty($position)) {
+        $error[] = "Position is required.";
+    }
+    if (empty($skills)) {
+        $error[] = "Skills are required.";
+    }
+    if (empty($email)) {
+        $error[] = "Email is required.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error[] = "Invalid email format.";
+    }
+    if (empty($phone)) {
+        $error[] = "Phone number is required.";
+    } elseif (!preg_match("/^[0-9]{10}$/", $phone)) {
+        $error[] = "Invalid phone number format. Must be 10 digits.";
+    }
+    if (empty($bio)) {
+        $error[] = "Bio is required.";
+    }
+    
