@@ -57,20 +57,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error[] = "Bio is required.";
     }
 
-    //reCAPTCHA validation
-    $recaptcha = $_POST['g-recaptcha-response'];
+    
+    // File upload
+    $resume_file_name = null;
+    if (isset($_FILES['resume_file']) && $_FILES['resume_file']['error'] != UPLOAD_ERR_NO_FILE) {
+        $target_dir = "uploads/";
+        if (!is_dir($target_dir)) mkdir($target_dir, 0777, true);
+        $resume_file_name = time() . "_" . basename($_FILES["resume_file"]["name"]);
+        $target_file = $target_dir . $resume_file_name;
 
-    if (empty($recaptcha)) {
-        $error[] = "Please complete the reCAPTCHA.";
-    } else {
-        $secretKey = $recaptcha_secret;;
-        $verify = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$secretKey&response=$recaptcha");
-        $response = json_decode($verify);
-
-        if (!$response->success) {
-            $error[] = "reCAPTCHA verification failed.";
+        if (!move_uploaded_file($_FILES["resume_file"]["tmp_name"], $target_file)) {
+            $errors[] = "Error uploading file.";
         }
     }
+
 
     // if there are no errors, insert data into the database
     if (empty($error)) {
