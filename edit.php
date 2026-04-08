@@ -75,11 +75,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <?php
 // display errors if there are any
-foreach ($errors as $error) {
-    echo "<p>$error</p>";
+foreach ($error as $err) {
+    echo "<p>$err</p>";
 }
 ?>
-// display the form
+<!-- // display the form -->
 <form method="POST">
     First Name: <input type="text" name="first_name" required><br>
     Last Name: <input type="text" name="last_name" required><br>
@@ -91,7 +91,7 @@ foreach ($errors as $error) {
     
     <button type="submit">Save</button>
 </form>
-// link to go back to the index page
+<!-- // link to go back to the index page -->
 <button type="back" onclick="window.location.href='index.php'">Back</button>
 
 
