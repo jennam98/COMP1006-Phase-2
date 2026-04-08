@@ -82,30 +82,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Resume</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+</head>
+<body class="p-5">
+
 <h2>Create Resume</h2>
 
-<?php
-// display errors if there are any
-foreach ($error as $err) {
-    echo "<p>$err</p>";
-}
-?>
-<!-- // display the form -->
- <!-- reCAPTCHA script -->
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
-<form method="POST">
-    First Name: <input type="text" name="first_name" required><br>
-    Last Name: <input type="text" name="last_name" required><br>
-    Current Position: <input type="text" name="position"><br>
-    Skills: <textarea name="skills"></textarea><br>
-    Email: <input type="email" name="email" required><br>
-    Phone: <input type="text" name="phone"><br>
-    Bio: <textarea name="bio"></textarea><br>
-    <!-- reCAPTCHA html -->
-    <div class="g-recaptcha" data-sitekey="6LdEpq0sAAAAABqBgxM2Hfy9SFnHjpC7FOT7iScR"></div>
-    <button type="submit">Save</button>
-</form>
-<!-- // link to go back to the index page -->
-<button type="back" onclick="window.location.href='index.php'">Back</button>
+<?php foreach ($errors as $err): ?>
+    <div class="alert alert-danger"><?= $err ?></div>
+<?php endforeach; ?>
 
-</div>
+<form method="POST" enctype="multipart/form-data" class="mt-3">
+    <div class="mb-2"><input class="form-control" type="text" name="first_name" placeholder="First Name" required></div>
+    <div class="mb-2"><input class="form-control" type="text" name="last_name" placeholder="Last Name" required></div>
+    <div class="mb-2"><input class="form-control" type="text" name="position" placeholder="Position"></div>
+    <div class="mb-2"><textarea class="form-control" name="skills" placeholder="Skills"></textarea></div>
+    <div class="mb-2"><input class="form-control" type="email" name="email" placeholder="Email" required></div>
+    <div class="mb-2"><input class="form-control" type="text" name="phone" placeholder="Phone"></div>
+    <div class="mb-2"><textarea class="form-control" name="bio" placeholder="Bio"></textarea></div>
+    <div class="mb-2"><input class="form-control" type="file" name="resume_file"></div>
+    <button class="btn btn-primary" type="submit">Save</button>
+    <a class="btn btn-secondary" href="index.php">Back</a>
+</form>
+
+</body>
+</html>
