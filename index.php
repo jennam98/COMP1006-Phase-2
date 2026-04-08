@@ -21,7 +21,7 @@ if ($result->num_rows > 0) {
         echo "</div><hr>";
     }
 } else {
-    echo "<p>Click create resume to add your first resume.</p>";
+    echo "<p>Click \"Create New Resume\" to add your first resume.</p>";
 }
 
 $conn->close();

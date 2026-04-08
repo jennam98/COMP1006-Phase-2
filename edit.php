@@ -59,14 +59,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // if there are no errors, insert data into the database
-    if (empty($error)) {
-        $stmt = $conn->prepare("INSERT INTO resumes (first_name, last_name, position, skills, email, phone, bio) VALUES (?, ?, ?, ?, ?, ?, ?)");
+   if (empty($error)) {
+        $stmt = $conn->prepare("UPDATE resumes 
+        SET first_name=?, last_name=?, position=?, skills=?, email=?, phone=?, bio=? 
+        WHERE id=?");
 
-        $stmt->bind_param("sssssss", $first, $last, $position, $skills, $email, $phone, $bio);      
+        $stmt->bind_param("sssssssi", $first, $last, $position, $skills, $email, $phone, $bio, $id);
         $stmt->execute();
 
         header("Location: index.php");
         exit();
+
     }
 }
 ?>
@@ -81,13 +84,13 @@ foreach ($error as $err) {
 ?>
 <!-- // display the form -->
 <form method="POST">
-    First Name: <input type="text" name="first_name" required><br>
-    Last Name: <input type="text" name="last_name" required><br>
-    Current Position: <input type="text" name="position"><br>
-    Skills: <textarea name="skills"></textarea><br>
-    Email: <input type="email" name="email" required><br>
-    Phone: <input type="text" name="phone"><br>
-    Bio: <textarea name="bio"></textarea><br>
+    First Name: <input type="text" name="first_name" value="<?= $resume['first_name'] ?>" required><br>
+    Last Name: <input type="text" name="last_name" value="<?= $resume['last_name'] ?>" required><br>
+    Current Position: <input type="text" name="position" value="<?= $resume['position'] ?>"><br>
+    Skills: <textarea name="skills"><?= $resume['skills'] ?></textarea><br>
+    Email: <input type="email" name="email" value="<?= $resume['email'] ?>" required><br>
+    Phone: <input type="text" name="phone" value="<?= $resume['phone'] ?>"><br>
+    Bio: <textarea name="bio"><?= $resume['bio'] ?></textarea><br>
     
     <button type="submit">Save</button>
 </form>
