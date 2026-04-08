@@ -73,12 +73,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
     // if there are no errors, insert data into the database
-    if (empty($error)) {
-        $stmt = $conn->prepare("INSERT INTO resumes (first_name, last_name, position, skills, email, phone, bio) VALUES (?, ?, ?, ?, ?, ?, ?)");
-
-        $stmt->bind_param("sssssss", $first, $last, $position, $skills, $email, $phone, $bio);      
+    if (empty($errors)) {
+        $stmt = $conn->prepare("INSERT INTO resumes (first_name,last_name,position,skills,email,phone,bio,resume_file,user_id) VALUES (?,?,?,?,?,?,?,?,?)");
+        $stmt->bind_param("ssssssssi", $first, $last, $position, $skills, $email, $phone, $bio, $resume_file_name, $_SESSION['user_id']);
         $stmt->execute();
-
         header("Location: index.php");
         exit();
     }
