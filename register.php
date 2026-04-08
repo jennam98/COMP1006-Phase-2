@@ -18,3 +18,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!$username) $errors[] = "Username is required.";
     if (!$password) $errors[] = "Password is required.";
     if ($password !== $confirm_password) $errors[] = "Passwords do not match.";
+
+    // reCAPTCHA validation
+    $recaptcha = $_POST['g-recaptcha-response'] ?? '';
+    if (!$recaptcha) {
+        $errors[] = "Please complete the reCAPTCHA.";
+    } else {
+        $secretKey = $recaptcha_secret; // from config.php
+        $verify = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$secretKey&response=$recaptcha");
+        $response = json_decode($verify);
+        if (!$response->success) $errors[] = "reCAPTCHA verification failed.";
+    }
+
+
+    
