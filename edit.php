@@ -20,21 +20,13 @@ $stmt->execute();
 $resume = $stmt->get_result()->fetch_assoc();
 if (!$resume) { header("Location: index.php"); exit(); }
 
-
-
-// function to sanitize user input
 function clean_input($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
+    return htmlspecialchars(stripslashes(trim($data)));
 }
 
-$error = [];
+$errors = [];
 
-// check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
     $first = clean_input($_POST["first_name"]);
     $last = clean_input($_POST["last_name"]);
     $position = clean_input($_POST["position"]);
@@ -43,34 +35,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $phone = clean_input($_POST["phone"]);
     $bio = clean_input($_POST["bio"]);
 
-
-    // validate input
-    if (empty($first)) {
-        $error[] = "First name is required.";
-    }
-    if (empty($last)) {
-        $error[] = "Last name is required.";
-    }
-    if (empty($position)) {
-        $error[] = "Position is required.";
-    }
-    if (empty($skills)) {
-        $error[] = "Skills are required.";
-    }
-    if (empty($email)) {
-        $error[] = "Email is required.";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error[] = "Invalid email format.";
-    }
-    if (empty($phone)) {
-        $error[] = "Phone number is required.";
-    } elseif (!preg_match("/^[0-9]{10}$/", $phone)) {
-        $error[] = "Invalid phone number format. Must be 10 digits.";
-    }
-    if (empty($bio)) {
-        $error[] = "Bio is required.";
-    }
-
+    if (!$first) $errors[] = "First name is required.";
+    if (!$last) $errors[] = "Last name is required.";
+    if (!$position) $errors[] = "Position is required.";
+    if (!$skills) $errors[] = "Skills are required.";
+    if (!$email) $errors[] = "Email is required.";
+    elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Invalid email format.";
+    if (!$phone) $errors[] = "Phone is required.";
+    elseif (!preg_match("/^[0-9]{10}$/", $phone)) $errors[] = "Phone must be 10 digits.";
+    if (!$bio) $errors[] = "Bio is required.";
 
     // File upload
     $resume_file_name = $resume['resume_file']; // keep old file
@@ -123,6 +96,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 </body>
 </html>
-
-
-
