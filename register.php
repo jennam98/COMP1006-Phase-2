@@ -30,5 +30,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (!$response->success) $errors[] = "reCAPTCHA verification failed.";
     }
 
+    // Check if username exists
+    $stmt = $conn->prepare("SELECT id FROM users WHERE username=?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->store_result();
+    if ($stmt->num_rows > 0) $errors[] = "Username already taken.";
 
-    
