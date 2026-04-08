@@ -27,3 +27,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $response = json_decode($verify);
         if (!$response->success) $errors[] = "reCAPTCHA verification failed.";
     }
+
+    if (empty($errors)) {
+        $stmt = $conn->prepare("SELECT id, password FROM users WHERE username=?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->store_result();
+        $stmt->bind_result($id, $hashed_password);
+        if ($stmt->num_rows == 1) {
+            $stmt->fetch();
+            if (password_verify($password, $hashed_password)) {
+                $_SESSION['user_id'] = $id;
+                $_SESSION['username'] = $username;
+                header("Location: index.php");
+                exit();
+            } else {
+                $errors[] = "Incorrect password.";
+            }
+        } else {
+            $errors[] = "User not found.";
+        }
+    }
+}
+?>
