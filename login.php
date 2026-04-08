@@ -50,3 +50,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+<body class="p-5">
+
+<h2>Login</h2>
+
+<?php foreach ($errors as $err): ?>
+    <div class="alert alert-danger"><?= $err ?></div>
+<?php endforeach; ?>
+
+<form method="POST" class="mt-3">
+    <div class="mb-2"><input class="form-control" type="text" name="username" placeholder="Username" required></div>
+    <div class="mb-2"><input class="form-control" type="password" name="password" placeholder="Password" required></div>
+    <div class="mb-2">
+        <div class="g-recaptcha" data-sitekey="6LdEpq0sAAAAABqBgxM2Hfy9SFnHjpC7FOT7iScR"></div>
+    </div>
+    <button class="btn btn-primary" type="submit">Login</button>
+    <a class="btn btn-secondary" href="register.php">Register</a>
+</form>
+
+</body>
+</html>
