@@ -1,5 +1,8 @@
 <?php include 'config.php'; ?>
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
+<div class="container mt-5">
 <h2>Your Resumes</h2>
 <a href="create.php">Create New Resume</a>
 
@@ -26,3 +29,5 @@ if ($result->num_rows > 0) {
 
 $conn->close();
 ?>
+
+</div>
