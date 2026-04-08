@@ -67,13 +67,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $target_file = $target_dir . $resume_file_name;
 
         if (!move_uploaded_file($_FILES["resume_file"]["tmp_name"], $target_file)) {
-            $errors[] = "Error uploading file.";
+            $error[] = "Error uploading file.";
         }
     }
 
 
     // if there are no errors, insert data into the database
-    if (empty($errors)) {
+    if (empty($error)) {
         $stmt = $conn->prepare("INSERT INTO resumes (first_name,last_name,position,skills,email,phone,bio,resume_file,user_id) VALUES (?,?,?,?,?,?,?,?,?)");
         $stmt->bind_param("ssssssssi", $first, $last, $position, $skills, $email, $phone, $bio, $resume_file_name, $_SESSION['user_id']);
         $stmt->execute();
