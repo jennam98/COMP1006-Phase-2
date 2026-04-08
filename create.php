@@ -93,7 +93,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <h2>Create Resume</h2>
 
-<?php foreach ($errors as $err): ?>
+<?php foreach ($error as $err): ?>
     <div class="alert alert-danger"><?= $err ?></div>
 <?php endforeach; ?>
 
