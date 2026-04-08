@@ -1,11 +1,27 @@
-<?php include "config.php"; ?>
-
-<!-- Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<div class="container mt-5">
-
 <?php
+session_start();
+include "config.php";
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$id = $_GET['id'] ?? null;
+if (!$id) {
+    header("Location: index.php");
+    exit();
+}
+
+// Fetch existing resume
+$stmt = $conn->prepare("SELECT * FROM resumes WHERE id=? AND user_id=?");
+$stmt->bind_param("ii", $id, $_SESSION['user_id']);
+$stmt->execute();
+$resume = $stmt->get_result()->fetch_assoc();
+if (!$resume) { header("Location: index.php"); exit(); }
+
+
+
 // function to sanitize user input
 function clean_input($data) {
     $data = trim($data);
@@ -13,14 +29,6 @@ function clean_input($data) {
     $data = htmlspecialchars($data);
     return $data;
 }
-
-$id = $_GET["id"];
-// fetch existing resume data
-$stmt = $conn->prepare("SELECT * FROM resumes WHERE id = ?");
-$stmt->bind_param("i", $id);
-$stmt->execute();
-$result = $stmt->get_result();
-$resume = $result->fetch_assoc();
 
 $error = [];
 
@@ -63,62 +71,58 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error[] = "Bio is required.";
     }
 
-    //reCAPTCHA validation
-    $recaptcha = $_POST['g-recaptcha-response'];
 
-    if (empty($recaptcha)) {
-        $error[] = "Please complete the reCAPTCHA.";
-    } else {
-        $secretKey = $recaptcha_secret;;
-        $verify = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$secretKey&response=$recaptcha");
-        $response = json_decode($verify);
-
-        if (!$response->success) {
-            $error[] = "reCAPTCHA verification failed.";
+    // File upload
+    $resume_file_name = $resume['resume_file']; // keep old file
+    if (isset($_FILES['resume_file']) && $_FILES['resume_file']['error'] != UPLOAD_ERR_NO_FILE) {
+        $target_dir = "uploads/";
+        if (!is_dir($target_dir)) mkdir($target_dir, 0777, true);
+        $resume_file_name = time() . "_" . basename($_FILES["resume_file"]["name"]);
+        $target_file = $target_dir . $resume_file_name;
+        if (!move_uploaded_file($_FILES["resume_file"]["tmp_name"], $target_file)) {
+            $errors[] = "Error uploading file.";
         }
     }
 
-    // if there are no errors, insert data into the database
-   if (empty($error)) {
-        $stmt = $conn->prepare("UPDATE resumes 
-        SET first_name=?, last_name=?, position=?, skills=?, email=?, phone=?, bio=? 
-        WHERE id=?");
-
-        $stmt->bind_param("sssssssi", $first, $last, $position, $skills, $email, $phone, $bio, $id);
+    if (empty($errors)) {
+        $stmt = $conn->prepare("UPDATE resumes SET first_name=?, last_name=?, position=?, skills=?, email=?, phone=?, bio=?, resume_file=? WHERE id=? AND user_id=?");
+        $stmt->bind_param("sssssssssi", $first, $last, $position, $skills, $email, $phone, $bio, $resume_file_name, $id, $_SESSION['user_id']);
         $stmt->execute();
-
         header("Location: index.php");
         exit();
-
     }
 }
 ?>
 
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Resume</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+</head>
+<body class="p-5">
+
 <h2>Edit Resume</h2>
 
-<?php
-// display errors if there are any
-foreach ($error as $err) {
-    echo "<p>$err</p>";
-}
-?>
-<!-- // display the form -->
- <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-<form method="POST">
-    First Name: <input type="text" name="first_name" value="<?= $resume['first_name'] ?>" required><br>
-    Last Name: <input type="text" name="last_name" value="<?= $resume['last_name'] ?>" required><br>
-    Current Position: <input type="text" name="position" value="<?= $resume['position'] ?>"><br>
-    Skills: <textarea name="skills"><?= $resume['skills'] ?></textarea><br>
-    Email: <input type="email" name="email" value="<?= $resume['email'] ?>" required><br>
-    Phone: <input type="text" name="phone" value="<?= $resume['phone'] ?>"><br>
-    Bio: <textarea name="bio"><?= $resume['bio'] ?></textarea><br>
-    <!-- reCAPTCHA html -->
-    <div class="g-recaptcha" data-sitekey="6LdEpq0sAAAAABqBgxM2Hfy9SFnHjpC7FOT7iScR"></div>
+<?php foreach ($errors as $err): ?>
+    <div class="alert alert-danger"><?= $err ?></div>
+<?php endforeach; ?>
 
-    <button type="submit">Save</button>
+<form method="POST" enctype="multipart/form-data" class="mt-3">
+    <div class="mb-2"><input class="form-control" type="text" name="first_name" value="<?= $resume['first_name'] ?>" required></div>
+    <div class="mb-2"><input class="form-control" type="text" name="last_name" value="<?= $resume['last_name'] ?>" required></div>
+    <div class="mb-2"><input class="form-control" type="text" name="position" value="<?= $resume['position'] ?>"></div>
+    <div class="mb-2"><textarea class="form-control" name="skills"><?= $resume['skills'] ?></textarea></div>
+    <div class="mb-2"><input class="form-control" type="email" name="email" value="<?= $resume['email'] ?>" required></div>
+    <div class="mb-2"><input class="form-control" type="text" name="phone" value="<?= $resume['phone'] ?>"></div>
+    <div class="mb-2"><textarea class="form-control" name="bio"><?= $resume['bio'] ?></textarea></div>
+    <div class="mb-2"><input class="form-control" type="file" name="resume_file"></div>
+    <button class="btn btn-primary" type="submit">Save</button>
+    <a class="btn btn-secondary" href="index.php">Back</a>
 </form>
-<!-- // link to go back to the index page -->
-<button type="back" onclick="window.location.href='index.php'">Back</button>
 
-</div>
+</body>
+</html>
+
+
 
